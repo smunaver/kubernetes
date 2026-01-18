@@ -16,3 +16,11 @@
   416  clear
   417  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
   418  kubectl version --client
+\
+
+
+
+
+kops create cluster --name=kube.yenepoya.digital --state=s3://yenepoyadigital --zones=ap-south-1,ap-south-1 --node-count=2 --node-size=t3.small --control-plane-size=t3.medium --dns-zone=kube.yenepoya.digital --node-volume-size=12 --control-plane-volume-size=12 --ssh-public-key ~/.ssh/id_ed25519.pub
+
+kops update cluster --name=kube.yenepoya.digital --state=s3://yenepoyadigital --yes --admin

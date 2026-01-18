@@ -1,0 +1,18 @@
+ 401  apt update
+  402  apt install aws-cli --classic
+  403  apt install aws-cli
+  404  clear
+  405  snap install aws-cli --classic
+  406  aws config
+  407  clear
+  408  aws configure
+  409  ssh-keygen
+  410  ls .ssh/
+  411  clear
+  412  curl -Lo kops https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+  413  chmod +x kops
+  414  sudo mv kops /usr/local/bin/kops
+  415  kops
+  416  clear
+  417  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+  418  kubectl version --client

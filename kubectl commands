@@ -1,3 +1,14 @@
+kubectl.exe get services kubernetes
+  62 kubectl.exe describe kubernetes
+  63 kubectl.exe describe svc kubernetes
+  64 kubectl get svc kubernetes -o yaml
+  65 kubectl get svc kubernetes -o json
+  66 kubectl get svc kubernetes -n default
+  67 kubectl get endpoints kubernetes
+  68 kubectl describe endpoints kubernetes
+  69 kubectl get svc kubernetes -o yaml | Select-String "annotation","creation"
+
+
 Use "kubectl api-resources" for a complete list of supported resources.
 
 Examples:

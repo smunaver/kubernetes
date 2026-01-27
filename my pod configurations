@@ -6,11 +6,13 @@ metadata:
   lables:
     app: sultanapp
 spec:
-  - name: sultanapp
-    image: sultanmunaver/mywebapp
-    ports:
-     - name: sport
-       containerPort: 8081
+  containers:
+   - name: sultanapp
+     image: sultanmunaver/mywebapp
+     ports:
+      - name: sport
+        containerPort: 8081
+
 
 ---
 apiVersion: v1

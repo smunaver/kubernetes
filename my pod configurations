@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name:
+  lables:
+    app: sultanapp
+spec:
+  - name: sultanapp
+    image: sultanmunaver/mywebapp
+    ports:
+     - name: sport
+       containerPort: 8081
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vproapp
+  labels:
+    app: vproapp
+spec:
+  containers:
+   - name : appcontianer
+     image: imranvisualpath/freshtomapp:V7
+     ports:
+      - name: cport
+        containerPort: 8080
+
+    ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nextcloud
+  labels:
+    app: nextapp
+spec:
+ containers:
+   - name: nexapp
+     image: nextcloud:stable-fpm-alpine
+     ports:
+       - name: nextport
+         containerPort: 8080
+
+

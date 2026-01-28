@@ -1,0 +1,22 @@
+Your Laptop
+   ↓
+Linux VM (bridged, 192.168.0.21)
+   ↓
+Minikube (VirtualBox/VM driver, 192.168.59.100)
+   ↓
+Pod (10.244.0.12)
+
+
+OPTION 1 (Fastest): SSH port forwarding (works 100%)
+
+From your host machine:
+
+ssh -L 30090:192.168.59.100:30090 sultantalib@192.168.0.21
+
+
+Then open in browser:
+
+http://localhost:30090
+
+
+🔥 This is the cleanest workaround for labs.

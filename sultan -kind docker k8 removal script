@@ -1,0 +1,92 @@
+single, safe, copy-paste Bash script that will completely remove Docker, containerd, Kind, and Kubernetes leftovers on Ubuntu.
+
+You can save this as cleanup-docker-kind.sh and run it once.
+This is idempotent (won’t break if something is already gone).
+
+🧹 FULL CLEANUP SCRIPT (Docker + Kind + K8s)
+#!/bin/bash
+
+set -e
+
+echo "=============================="
+echo " FULL DOCKER + KIND CLEANUP"
+echo "=============================="
+
+echo "[1/9] Stopping Docker & container services..."
+sudo systemctl stop docker docker.socket containerd 2>/dev/null || true
+
+echo "[2/9] Deleting all Kind clusters (if any)..."
+if command -v kind >/dev/null 2>&1; then
+  for c in $(kind get clusters 2>/dev/null); do
+    kind delete cluster --name "$c" || true
+  done
+fi
+
+echo "[3/9] Removing Docker containers related to kind..."
+docker rm -f $(docker ps -aq --filter "name=kind") 2>/dev/null || true
+
+echo "[4/9] Purging Docker & container packages..."
+sudo apt-get purge -y \
+  docker-ce \
+  docker-ce-cli \
+  docker-ce-rootless-extras \
+  docker-buildx-plugin \
+  docker-compose-plugin \
+  docker.io \
+  containerd \
+  runc || true
+
+echo "[5/9] Removing Docker data directories..."
+sudo rm -rf /var/lib/docker
+sudo rm -rf /var/lib/containerd
+
+echo "[6/9] Removing user Docker config..."
+rm -rf ~/.docker
+
+echo "[7/9] Removing Docker group..."
+sudo groupdel docker 2>/dev/null || true
+
+echo "[8/9] Removing Docker APT repo & keys..."
+sudo rm -f /etc/apt/sources.list.d/docker.list
+sudo rm -f /etc/apt/keyrings/docker.gpg
+
+echo "[9/9] Cleaning Kubernetes configs..."
+rm -rf ~/.kube
+
+echo "Updating apt cache..."
+sudo apt-get update -y
+
+echo "======================================"
+echo " CLEANUP COMPLETE ✅"
+echo " Docker, Kind, Kubernetes are removed"
+echo "======================================"
+echo ""
+echo "Recommended: reboot the system"
+echo "sudo reboot"
+
+▶️ How to use it
+nano cleanup-docker-kind.sh
+# paste the script
+
+
+Make it executable:
+
+chmod +x cleanup-docker-kind.sh
+
+
+Run it:
+
+./cleanup-docker-kind.sh
+
+
+(Optional but strongly recommended)
+
+sudo reboot
+
+✅ After reboot, verify (must all fail)
+docker --version
+kind get clusters
+kubectl version
+
+
+If they error out → perfect 👌

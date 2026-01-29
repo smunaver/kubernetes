@@ -1,0 +1,106 @@
+ref : https://forum.k8ssandra.io/t/how-to-create-a-k8s-cluster-with-kind-on-ubuntu/68
+
+
+$ sudo apt-get remove docker docker-engine docker.io containerd runc
+$ sudo apt-get update
+$ sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+$ sudo apt-get update
+$ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+$ sudo usermod -aG docker $USER
+$ sudo usermod -aG docker $USER --> logout
+
+$ docker run hello-world
+Install kubectl
+$ sudo curl -L "https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
+$ sudo chmod +x /usr/local/bin/kubectl
+$ kubectl version --short --client
+Client Version: v1.21.0
+
+Install KinD
+$ sudo curl -L "https://kind.sigs.k8s.io/dl/v0.8.1/kind-$(uname)-amd64" -o /usr/local/bin/kind
+$ kind get clusters
+
+#!/bin/bash
+
+# For AMD64 / x86_64
+[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+chmod +x ./kind
+sudo cp ./kind /usr/local/bin/kind
+rm -rf kind
+
+Bring up a multi node cluster
+Create a config file (`config.yml`) with the below content:
+
+# 4 node (3 workers) cluster config
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  image: kindest/node:v1.28.0
+- role: worker
+  image: kindest/node:v1.28.0
+- role: worker
+  image: kindest/node:v1.28.0
+- role: worker
+  image: kindest/node:v1.28.0
+Start the 4 node cluster on this host:
+
+[binita@test-kubernetes]# kind create cluster --config=config.yml
+Creating cluster "kind" ...
+ ✓ Ensuring node image (kindest/node:v1.28.0) 🖼
+ ✓ Preparing nodes 📦 📦 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Installing StorageClass 💾
+ ✓ Joining worker nodes 🚜
+Set kubectl context to "kind-kind"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-kind
+
+Not sure what to do next? 😅  Check out https://kind.sigs.k8s.io/docs/user/quick-start/
+[binita@test-kubernetes]#
+
+Using kind based command:
+
+[binita@test-kubernetes]# kind get clusters
+kind
+Using kubectl based command. If you do not have kubectl installed, please refer to install kubectl linux to install it:
+
+[binita@test-kubernetes]# kubectl cluster-info
+Kubernetes control plane is running at https://127.0.0.1:41273
+CoreDNS is running at https://127.0.0.1:41273/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Using docker based command. It is worthwhile to note that all the nodes (control-plane and worker) comprising your cluster will be running as docker containers on your host. This can be easily deduced from the output of the below command:
+
+[binita@test-kubernetes]# docker ps
+CONTAINER ID   IMAGE                  COMMAND                  CREATED      STATUS        PORTS                       NAMES
+ed011f2dc7d7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 days ago   Up 28 hours                               kind-worker
+dc0940c24fce   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 days ago   Up 28 hours   127.0.0.1:41273->6443/tcp   kind-control-plane
+acec2cacdc3b   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 days ago   Up 28 hours                               kind-worker2
+8511cdf4bee7   kindest/node:v1.28.0   "/usr/local/bin/entr…"   4 days ago   Up 28 hours                               kind-worker3
+Check the status of each node on the cluster:
+
+[binita@test-kubernetes]# kubectl get nodes
+NAME                 STATUS   ROLES           AGE   VERSION
+kind-control-plane   Ready    control-plane   22m   v1.28.0
+kind-worker          Ready    <none>          21m   v1.28.0
+kind-worker2         Ready    <none>          21m   v1.28.0
+kind-worker3         Ready    <none>          21m   v1.28.0
+[binita@test-kubernetes]#
+Check the version of the cluster vs the version of the cluster client (kubectl)
+
+[binita@test-kubernetes]# kubectl version
+Client Version: v1.28.3
+Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
+Server Version: v1.28.0

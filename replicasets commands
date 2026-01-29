@@ -1,0 +1,40 @@
+ kubectl scale --replicas=7 replicaset inspireit-replicaset
+
+
+ get rs
+
+ PS D:\devops-k8\app> kubectl.exe get rs
+NAME                              DESIRED   CURRENT   READY   AGE
+inspireit-replicaset              7         7         7       10m
+nextcloud-deployment-85889c59f7   1         1         1       25h
+ubuntu-deployment-7d4778d4fd      2         2         2       25h
+
+delete rs
+
+PS D:\devops-k8\app> kubectl.exe delete rs inspireit-replicaset nextcloud-deployment-85889c59f7 ubuntu-deployment-7d4778d4fd
+
+PS D:\devops-k8\app> kubectl.exe delete rs inspireit-replicaset nextcloud-deployment-85889c59f7 ubuntu-deployment-7d4778d4fd
+replicaset.apps "inspireit-replicaset" deleted from default namespace
+replicaset.apps "nextcloud-deployment-85889c59f7" deleted from default namespace
+replicaset.apps "ubuntu-deployment-7d4778d4fd" deleted from default namespace
+PS D:\devops-k8\app>
+
+if rs are not gettign delete then first delete the deployments
+
+PS D:\devops-k8\app> kubectl get deployments.apps
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+nextcloud-deployment   1/1     1            1           25h
+ubuntu-deployment      2/2     2            2           26h
+PS D:\devops-k8\app> kubectl get deployments.apps nextcloud-deployment
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+nextcloud-deployment   1/1     1            1           25h
+PS D:\devops-k8\app> kubectl delete deployments.apps nextcloud-deployment
+deployment.apps "nextcloud-deployment" deleted from default namespace
+PS D:\devops-k8\app> kubectl get deployments.apps ubuntu-deployment
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+ubuntu-deployment   2/2     2            2           26h
+PS D:\devops-k8\app> kubectl delete deployments.apps ubuntu-deployment
+deployment.apps "ubuntu-deployment" deleted from default namespace
+PS D:\devops-k8\app> kubectl get rs
+No resources found in default namespace.
+PS D:\devops-k8\app>
